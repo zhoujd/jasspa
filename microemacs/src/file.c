@@ -2602,8 +2602,8 @@ fileOp(int f, int n)
     }
     if(rr > 0)
     {
-        if(n & meFILEOP_BACKUP)
-            dFlags |= meRWFLAG_BACKUP;
+        //if(n & meFILEOP_BACKUP)
+        //    dFlags |= meRWFLAG_BACKUP;
         if(n & meFILEOP_FTPCLOSE)
             dFlags |= meRWFLAG_SOCKCLOSE;
         if((rr = ffFileOp(sfname,fn,dFlags,fileMask)) > 0)
@@ -2696,8 +2696,8 @@ autowriteremove(register meBuffer *bp)
 int
 writeOut(register meBuffer *bp, meUInt flags, meUByte *fn)
 {
-    if(meModeTest(bp->mode,MDBACKUP))
-        flags |= meRWFLAG_BACKUP ;
+    //if(meModeTest(bp->mode,MDBACKUP))
+    //    flags |= meRWFLAG_BACKUP ;
 #if MEOPT_TIMSTMP
     set_timestamp(bp);			/* Perform time stamping */
 #endif
