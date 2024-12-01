@@ -353,8 +353,8 @@ regSave(meRegNode *rnp, meUByte *fname, int mode)
                 return mlwrite(MWABORT|MWPAUSE,(meUByte *)"Registry: No file name specified on save");
         }
         flags = meRWFLAG_WRITE ;
-        if(mode & meREGMODE_BACKUP)
-            flags |= meRWFLAG_BACKUP ;
+        //if(mode & meREGMODE_BACKUP)
+        //    flags |= meRWFLAG_BACKUP ;
         if(mode & (meREGMODE_ACRYPT|meREGMODE_PCRYPT))
         {
             meUInt key[meCRYPT_KEY_SIZE];
