@@ -1942,7 +1942,8 @@ execFile(meUByte *fname, int f, int n)
     {
         if(status)
             return meABORT ;
-        return mlwrite(MWABORT|MWCLEXEC,(meUByte *)"[Failed to load file %s]", fname);
+        //return mlwrite(MWABORT|MWCLEXEC,(meUByte *)"[Failed to load file %s]", fname);
+        return mlwrite(MWABORT|MWCLEXEC,(meUByte *)"[Ready]");
     }
     /* go execute it! */
     if((status = donbuf(&hlp,&varList,fn,f,n)) <= 0)
