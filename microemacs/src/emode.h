@@ -82,7 +82,6 @@ meMode globMode = {
     meModeMask(MDEXACT)  |
 #ifndef _NANOEMACS
     meModeMask(MDAUTOSV) |
-    meModeMask(MDBACKUP) |
 #endif
     meModeMask(MDLF)     |
 #ifdef _WIN32
