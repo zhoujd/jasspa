@@ -67,12 +67,12 @@ OUTDIRD  = .$(BUILDID)-debug
 TRDPARTY = ../3rdparty
 
 CCDEFS   = -m$(BIT_SIZE) -D_LINUX -D_ARCHITEC=$(ARCHITEC) -D_TOOLKIT=$(TOOLKIT) -D_TOOLKIT_VER=$(TOOLKIT_VER) -D_PLATFORM_VER=$(PLATFORM_VER) -D_$(BIT_SIZE)BIT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -I. -I$(TRDPARTY)/tfs -I$(TRDPARTY)/zlib -DmeVER_CN=$(meVER_CN) -DmeVER_YR=$(meVER_YR) -DmeVER_MN=$(meVER_MN) -DmeVER_DY=$(meVER_DY) $(MAKECDEFS)
-CCFLAGSR = -O3 -flto -DNDEBUG=1 -Wall -Wno-uninitialized -Wno-unused-result
-CCFLAGSD = -g -Wall
+CCFLAGSR = -O3 -flto -DNDEBUG=1 -Wall -Wno-uninitialized -Wno-unused-result -static -static-libgcc
+CCFLAGSD = -g -Wall -static -static-libgcc
 LDDEFS   = -m$(BIT_SIZE)
-LDFLAGSR = -O3 -flto=auto
-LDFLAGSD = -g
-LDLIBS   = -lm -ldl -frtti -lz -ltinfo
+LDFLAGSR = -O3 -flto=auto -static -static-libgcc
+LDFLAGSD = -g  -static -static-libgcc
+LDLIBS   =
 
 ifeq (debug,$(BCFG))
 BOUTDIR  = $(OUTDIRD)
