@@ -502,7 +502,8 @@ meSchemeSet *hilBlock;                  /* Hilighting style change      */
 meInt     cursorState=0;                /* Current state of cursor      */
 meUByte  *meProgName=NULL;              /* the program name (argv[0])   */
 #if MEOPT_EXTENDED
-meUByte   orgModeLineStr[]="%s%r%u%K %b %l of %n - %Y%-%m%-%d %H:%M (%O) - (%f) ";
+/*meUByte   orgModeLineStr[]="%s%r%u%K %b %l of %n - %Y%-%m%-%d %H:%M (%O) - (%f) ";*/
+meUByte   orgModeLineStr[]="%s%r%u%K %b %l of %n - (%O) - (%f) ";
 #else
 meUByte   orgModeLineStr[]="%s%r%u " ME_SHORTNAME " (%O) - %l %b (%f) ";
 #endif
@@ -631,7 +632,7 @@ meUByte   displayTab=' ';               /* tab \t display character     */
 meUByte   displayNewLine=' ';           /* new-line \n display character*/
 meUByte   displaySpace=' ';             /* space ' ' display character  */
 meTime    startTime;                    /* me start time used as offset */
-meInt	  meGetKeyFirst=-1;             /* Push input key               */
+meInt     meGetKeyFirst=-1;             /* Push input key               */
 meUByte   thisflag;                     /* Flags, this command          */
 meUByte   lastflag;                     /* Flags, last command          */
 meUByte   alarmState=0;                 /* Unix auto-save alarm time    */
