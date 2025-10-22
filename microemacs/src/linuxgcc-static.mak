@@ -1,9 +1,9 @@
 # -!- makefile -!-
 #
 # JASSPA MicroEmacs - www.jasspa.com
-# linux32gcc.mak - Make file for Linux (v3+ Kernel) using gcc
+# linuxgcc.mak - Make file for Linux using gcc
 #
-# Copyright (C) 2001-2009 JASSPA (www.jasspa.com)
+# Copyright (C) 2001-2024 JASSPA (www.jasspa.com)
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -21,14 +21,9 @@
 #
 ##############################################################################
 #
-# Created:     Wed Jul 28 2004
-# Synopsis:    Make file for Linux v2 Kernel 2.6 using gcc
+# Synopsis:    Make file for Linux using gcc
 # Notes:
-#	Run "make -f linux26gcc.mak"      for optimised build produces ./me
-#	Run "make -f linux26gcc.mak med"  for debug build produces     ./med
-#
-#	Run "make -f linux26gcc.mak clean"      to clean source directory
-#	Run "make -f linux26gcc.mak spotless"   to clean source directory even more
+#     Run ./build.sh to compile, ./build.sh -h for more information.
 #
 ##############################################################################
 
@@ -43,18 +38,27 @@ AR       = ar
 RM       = rm -f
 RMDIR    = rm -rf
 
+include evers.mak
+
 TOOLKIT  = gcc
 TOOLKIT_VER = $(shell $(CC) -dumpversion)
 
+ifneq "$(ARCHITEC)" ""
+else ifeq "$(shell uname -m | cut -c 1-5)" "aarch"
+ARCHITEC = aarch
+else ifeq "$(shell uname -m | cut -c 1-3)" "arm"
+ARCHITEC = aarch
+else
 ARCHITEC = intel
+endif
 ifeq (,$(BIT_SIZE))
 BIT_SIZE = $(shell getconf LONG_BIT)
+else
+BIT_OPT  = -m$(BIT_SIZE)
 endif
 
 PLATFORM = linux
 PLATFORM_VER = $(shell uname -r | cut -f 1 -d .)
-
-include evers.mak
 
 MAKEFILE = $(PLATFORM)$(TOOLKIT)
 ifeq (1,$(BPRF))
@@ -66,13 +70,13 @@ OUTDIRR  = .$(BUILDID)-release
 OUTDIRD  = .$(BUILDID)-debug
 TRDPARTY = ../3rdparty
 
-CCDEFS   = -m$(BIT_SIZE) -D_LINUX -D_ARCHITEC=$(ARCHITEC) -D_TOOLKIT=$(TOOLKIT) -D_TOOLKIT_VER=$(TOOLKIT_VER) -D_PLATFORM_VER=$(PLATFORM_VER) -D_$(BIT_SIZE)BIT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -I. -I$(TRDPARTY)/tfs -I$(TRDPARTY)/zlib -DmeVER_CN=$(meVER_CN) -DmeVER_YR=$(meVER_YR) -DmeVER_MN=$(meVER_MN) -DmeVER_DY=$(meVER_DY) $(MAKECDEFS)
-CCFLAGSR = -O3 -flto -DNDEBUG=1 -Wall -Wno-uninitialized -Wno-unused-result -static -static-libgcc
-CCFLAGSD = -g -Wall -static -static-libgcc
-LDDEFS   = -m$(BIT_SIZE)
-LDFLAGSR = -O3 -flto=auto -static -static-libgcc
-LDFLAGSD = -g  -static -static-libgcc
-LDLIBS   =
+CCDEFS   = $(BIT_OPT) -D_LINUX -D_ARCHITEC=$(ARCHITEC) -D_TOOLKIT=$(TOOLKIT) -D_TOOLKIT_VER=$(TOOLKIT_VER) -D_PLATFORM_VER=$(PLATFORM_VER) -D_$(BIT_SIZE)BIT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -I. -I$(TRDPARTY)/tfs -DmeVER_CN=$(meVER_CN) -DmeVER_YR=$(meVER_YR) -DmeVER_MN=$(meVER_MN) -DmeVER_DY=$(meVER_DY) $(MAKECDEFS)
+CCFLAGSR = -O3 -flto -DNDEBUG=1 -Wall -Wno-uninitialized -Wno-unused-result -static
+CCFLAGSD = -g -O0 -Wall -static
+LDDEFS   = $(BIT_OPT)
+LDFLAGSR = -O3 -flto=auto -static
+LDFLAGSD = -g -O0 -static
+LDLIBS   = -lm -ldl
 
 ifeq (debug,$(BCFG))
 BOUTDIR  = $(OUTDIRD)
@@ -113,7 +117,7 @@ OPENSSLDEFS = -DMEOPT_OPENSSL=$(OPENSSLP) -D_OPENSSLLNM=libssl$(OPENSSLV).so -D_
 endif
 BCOR     = me
 BCOR_CDF = -D_SOCKET $(OPENSSLDEFS)
-PRGLIBS  = $(TRDPARTY)/tfs/$(BOUTDIR)/tfs$(A) $(TRDPARTY)/zlib/$(BOUTDIR)/zlib$(A)
+PRGLIBS  = $(TRDPARTY)/tfs/$(BOUTDIR)/tfs$(A)
 
 endif
 
@@ -155,11 +159,19 @@ endif
 ifneq (,$(WINDOW_LIBS))
 $(warning WARNING: No X11 support found, forcing build type to console only.)
 BTYP = c
-else ifeq (0,$(shell printf '$(HASH)include <stdio.h>\n$(HASH)include <X11/Intrinsic.h>\nint main(){return 0;}\n' | $(LD) -x c $(LDDEFS) $(LDFLAGS) -o /dev/null $(X11_LIBS) -lXpm > /dev/null 2> /dev/null - ; echo $$? ))
-WINDOW_DEFS = -D_XPM
+else
+
+ifeq (0,$(shell printf '$(HASH)include <stdio.h>\n$(HASH)include <X11/Intrinsic.h>\nint main(){return 0;}\n' | $(LD) -x c $(LDDEFS) $(LDFLAGS) -o /dev/null $(X11_LIBS) -lXpm > /dev/null 2> /dev/null - ; echo $$? ))
+WINDOW_DEFS = -D_XPM 
 WINDOW_LIBS = $(X11_LIBS) -lXpm
 else
 WINDOW_LIBS = $(X11_LIBS)
+endif
+ifeq (0,$(shell pkg-config --exists xft; echo $$? ))
+WINDOW_DEFS += -DMEOPT_XFT=1 $(shell pkg-config --cflags xft)  
+WINDOW_LIBS += $(shell pkg-config --libs xft)
+endif
+
 endif
 
 endif
@@ -225,19 +237,14 @@ $(OUTDIR):
 $(INSTDIR):
 	-mkdir $(INSTDIR)
 
-$(TRDPARTY)/zlib/$(BOUTDIR)/zlib$(A):
-	cd $(TRDPARTY)/zlib && $(MK) -f $(MAKEFILE).mak BCFG=$(BCFG)
-
 $(TRDPARTY)/tfs/$(BOUTDIR)/tfs$(A):
 	cd $(TRDPARTY)/tfs && $(MK) -f $(MAKEFILE).mak BCFG=$(BCFG)
 
 clean:
 	$(RMDIR) $(OUTDIR)
 	cd $(TRDPARTY)/tfs && $(MK) -f $(MAKEFILE).mak clean
-	cd $(TRDPARTY)/zlib && $(MK) -f $(MAKEFILE).mak clean
 
 spotless: clean
 	$(RM) *~
 	$(RM) tags
 	cd $(TRDPARTY)/tfs && $(MK) -f $(MAKEFILE).mak spotless
-	cd $(TRDPARTY)/zlib && $(MK) -f $(MAKEFILE).mak spotless
