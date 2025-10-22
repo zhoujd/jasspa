@@ -503,7 +503,7 @@ meInt     cursorState=0;                /* Current state of cursor      */
 meUByte  *meProgName=NULL;              /* the program name (argv[0])   */
 #if MEOPT_EXTENDED
 /*meUByte   orgModeLineStr[]="%s%r%u%K %b %l of %n - %Y%-%m%-%d %H:%M (%O) - (%f) ";*/
-meUByte   orgModeLineStr[]="%s%r%u%K %b %l of %n - (%O) - (%f) ";
+meUByte   orgModeLineStr[]="%r%u%K %b %l of %n - (%O) - (%f) ";
 #else
 meUByte   orgModeLineStr[]="%s%r%u " ME_SHORTNAME " (%O) - %l %b (%f) ";
 #endif
